@@ -1,4 +1,5 @@
 import { Clock } from "./Clock.js";
+import { Sprite } from "./CanvasSprite.js";
 
 const TIME_SCALE = 0.06;
 const DIRECTION = Object.freeze({
@@ -42,8 +43,8 @@ export class BlockBlock {
     
         gameClock.addInterval(this.update.bind(this));
         gameClock.addInterval((() => {
-            this.blocks.push(this.createRandomBlock());
-        }).bind(this), 500);
+            this.blocks.push(...this.createRandomBlock());
+        }).bind(this), 650);
     }
 
     //#region view
@@ -126,9 +127,13 @@ export class BlockBlock {
     //#region helpers
     createRandomBlock() {
         const random = Math.random();
-        if (random < 0.33) return new Block(this.bounds.RIGHT, 0, this.#BLOCK_SPEED, DIRECTION.RIGHT);
-        if (random < 0.66) return new Block(0, this.bounds.TOP, this.#BLOCK_SPEED, DIRECTION.UP);
-        if (random < 1.00) return new Block(this.bounds.LEFT, 0, this.#BLOCK_SPEED, DIRECTION.LEFT);
+        if (random < 0.25) return [new Block(this.bounds.RIGHT, 0, this.#BLOCK_SPEED, DIRECTION.RIGHT)];
+        if (random < 0.50) return [new Block(0, this.bounds.TOP, this.#BLOCK_SPEED, DIRECTION.UP)];
+        if (random < 0.75) return [new Block(this.bounds.LEFT, 0, this.#BLOCK_SPEED, DIRECTION.LEFT)];
+        if (random < 1.00) return [
+            new Block(this.bounds.RIGHT, 0, this.#BLOCK_SPEED, DIRECTION.RIGHT),
+            new Block(this.bounds.LEFT, 0, this.#BLOCK_SPEED, DIRECTION.LEFT)
+        ];
     }
     //#endregion helpers
 }
@@ -138,6 +143,8 @@ class Player {
     y;
     #facingIndex = 0;
     #facing;
+
+    sprite;
 
     set facing(value) {
         this.#facingIndex++;
@@ -170,6 +177,7 @@ class Player {
         this.#facing = DIRECTION.FORWARD;
         this.state = Player.PLAYER_STATE.IDLE;
         this.#TWO_ROOT_JUMP_HEIGHT = 2 * Math.sqrt(this.#JUMP_HEIGHT);
+        this.sprite = new Sprite('../media/cat-big.png');
     }
 
     draw(ctx) {
@@ -179,8 +187,9 @@ class Player {
         ctx.fillStyle = 'black';
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 2;
-        ctx.fillRect(0, 0, Player.SIZE, Player.SIZE);
-        ctx.strokeRect(0, 0, Player.SIZE, Player.SIZE);
+        // ctx.fillRect(0, 0, Player.SIZE, Player.SIZE);
+        // ctx.strokeRect(0, 0, Player.SIZE, Player.SIZE);
+        ctx.drawImage(this.sprite.image, 0, 0, Player.SIZE, Player.SIZE);
         
         ctx.strokeStyle = 'red';
         ctx.beginPath();
